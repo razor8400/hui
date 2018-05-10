@@ -15,6 +15,6 @@ namespace engine
         pool_manager();
         ~pool_manager();
     private:
-        vector<ref*> m_pool;
+        vector<pointer<ref>> m_pool;
     };
 }

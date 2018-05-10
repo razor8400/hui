@@ -4,11 +4,6 @@
 
 namespace engine
 {
-    touch_listener::~touch_listener()
-    {
-        touch_dispatcher::instance().remove_touch_listener(this);
-    }
-    
     bool touch_listener::on_touch_began()
     {
         if (touch_began)

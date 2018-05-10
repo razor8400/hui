@@ -1,3 +1,4 @@
+#include "engine.h"
 #include "my_app_delegate.h"
 
 void my_app_delegate::application_launched(engine::application* application)
@@ -43,7 +44,7 @@ void my_app_delegate::run_match3_scene()
     
     auto script = engine::scriptable_component::create("scripts/match3scene.lua");
     auto scene = engine::game_object::create<engine::scene>();
-    
+        
     scene->add_component(script);
     
     director.run_scene(scene);

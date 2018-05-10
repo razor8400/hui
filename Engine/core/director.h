@@ -31,14 +31,16 @@ namespace engine
         scene* running_scene() const { return m_scene; }
         float get_delta_time() const;
         time_t get_local_time() const;
+        
+        const math::mat4& get_world() const;
 	private:
         void update(float delta_time);
         
         director();
         ~director();
     private:
-        scene* m_scene = nullptr;
-        scene* m_next_scene = nullptr;
+        pointer<scene> m_scene;
+        pointer<scene> m_next_scene;
 
 		bool m_running = false;
 

@@ -1,18 +1,6 @@
 #include "common.h"
 #include "scripting.h"
 
-#include "utils/file_utils.h"
-#include "components/component.h"
-#include "components/box_collider2d.h"
-#include "components/action.h"
-
-#include "core/application.h"
-#include "core/director.h"
-#include "core/game_object.h"
-#include "core/scene.h"
-
-#include "2d/sprite.h"
-
 #define CHECK_TOP(L, TOP)\
 auto n = lua_gettop(L);\
 if (n < TOP)\
@@ -667,6 +655,16 @@ namespace engine
             {
                 if (lua_isstring(L, 1))
                 {
+					if (lua_isstring(L, 2))
+					{
+						auto atlas = lua_tostring(L, 1);
+						auto texture = lua_tostring(L, 2);
+
+						CLEAR_TOP(L);
+
+						return game_object::create<engine::sprite>(L, atlas, texture);
+					}
+
                     auto texture = lua_tostring(L, 1);
                     
                     CLEAR_TOP(L);
@@ -675,6 +673,11 @@ namespace engine
                 } 
                 
                 return game_object::create<engine::sprite>(L);
+            }
+            
+            int destroy(lua_State* L)
+            {
+                return scripting::destroy_ref<engine::sprite>(L);
             }
             
             int set_color(lua_State* L)
@@ -810,14 +813,28 @@ namespace engine
                 return 1;
             }
         }
-        
-        namespace action
-        {
-            int destroy(lua_State* L)
-            {
-                return destroy_ref<engine::action>(L);
-            }
-        }
+
+		namespace batch_sprite
+		{
+			int create(lua_State* L)
+			{
+				if (lua_isstring(L, 1))
+				{
+					auto texture = lua_tostring(L, 1);
+
+					CLEAR_TOP(L);
+
+					return game_object::create<engine::batch_sprite>(L, texture);
+				}
+
+				return game_object::create<engine::batch_sprite>(L);
+			}
+
+			int destroy(lua_State* L)
+			{
+				return destroy_ref<engine::batch_sprite>(L);
+			}
+		}
         
         namespace targeted_action
         {
@@ -830,7 +847,7 @@ namespace engine
                 
                 if (target && action)
                 {
-                    auto targeted = engine::targeted_action::create(action, target);
+                    auto targeted = action::create<engine::targeted_action>(action, target);
                     
                     CLEAR_TOP(L);
                     
@@ -838,6 +855,11 @@ namespace engine
                 }
                 
                 return 1;
+            }
+            
+            int destroy(lua_State* L)
+            {
+                return destroy_ref<engine::targeted_action>(L);
             }
         }
         
@@ -850,11 +872,16 @@ namespace engine
                 
                 lua_pushvalue(L, -1);
                 auto handler = luaL_ref(L, LUA_REGISTRYINDEX);
-                auto action = engine::action_lua_callback::create(L, handler);
+                auto action = action::create<engine::action_lua_callback>(L, handler);
 
                 push_ref(L, action);
                 
                 return 1;
+            }
+            
+            int destroy(lua_State* L)
+            {
+                return destroy_ref<engine::action_lua_callback>(L);
             }
         }
         
@@ -873,7 +900,7 @@ namespace engine
                     actions.push_back(action);
                 }
                 
-                auto sequence = ref::create<engine::action_sequence>();
+                auto sequence = action::create<engine::action_sequence>();
                 
                 for (auto it = actions.rbegin(); it != actions.rend(); ++it)
                     sequence->append(*it);
@@ -897,6 +924,11 @@ namespace engine
                 
                 return 0;
             }
+            
+            int destroy(lua_State* L)
+            {
+                return destroy_ref<engine::action_sequence>(L);
+            }
         }
         
         namespace action_list
@@ -914,7 +946,7 @@ namespace engine
                     actions.push_back(action);
                 }
                 
-                auto list = engine::action_list::list(actions);
+                auto list = action::create<engine::action_list>();
                 
                 push_ref(L, list);
                 
@@ -935,6 +967,11 @@ namespace engine
                 
                 return 0;
             }
+            
+            int destroy(lua_State* L)
+            {
+                return destroy_ref<engine::action_list>(L);
+            }
         }
         
         namespace action_delay
@@ -942,12 +979,18 @@ namespace engine
             int create(lua_State* L)
             {
                 auto duration = get_number(L, 1);
+                auto action = action::create<engine::action_delay>(duration);
                 
                 CLEAR_TOP(L);
                 
-                push_ref(L, engine::action_delay::delay(duration));
+                push_ref(L, action);
                 
                 return 1;
+            }
+            
+            int destroy(lua_State* L)
+            {
+                return destroy_ref<engine::action_delay>(L);
             }
         }
         
@@ -996,6 +1039,11 @@ namespace engine
                 push_ref(L, action);
                 
                 return 1;
+            }
+            
+            int destroy(lua_State* L)
+            {
+                return destroy_ref<engine::action_move>(L);
             }
         }
     }

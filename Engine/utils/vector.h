@@ -12,8 +12,8 @@ namespace engine
         typedef std::vector<T> base_class;
         void lock(const std::function<void()>& handler);
         
-        void push_back(T obj);
-        void erase(T obj);
+        void push_back(const T& obj);
+        void erase(const T& obj);
     private:
         void unlock();
         void update();
@@ -24,5 +24,3 @@ namespace engine
         bool m_locked = false;
     };
 }
-
-#include "vector.inl"

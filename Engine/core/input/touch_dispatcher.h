@@ -19,7 +19,7 @@ namespace engine
         touch_dispatcher();
         ~touch_dispatcher();
     private:
-        vector<touch_listener*> m_listeners;
-        vector<touch_listener*> m_active_listeners;
+        vector<pointer<touch_listener>> m_listeners;
+        vector<pointer<touch_listener>> m_active_listeners;
     };
 }

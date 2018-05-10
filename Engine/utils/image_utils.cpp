@@ -35,7 +35,7 @@ namespace engine
             
             if (file)
             {
-                data->buffer = stbi_load_from_file(file, &data->width, &data->height, &data->format, STBI_rgb_alpha);
+				data->buffer = stbi_load_from_file(file, &data->width, &data->height, &data->format, STBI_rgb_alpha);
                 data->format = stbi_format_to_gl(data->format);
                 
                 fclose(file);

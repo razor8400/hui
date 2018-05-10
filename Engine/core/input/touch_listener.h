@@ -7,8 +7,6 @@ namespace engine
     class touch_listener : public ref
     {
     public:
-        ~touch_listener();
-        
         bool on_touch_began();
         void on_touch_moved();
         void on_touch_ended();

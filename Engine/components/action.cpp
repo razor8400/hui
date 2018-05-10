@@ -8,63 +8,66 @@ namespace engine
 {
     IMPLEMENT_TYPE_INFO(action)
     
-    void action::done_action()
+    void action::update(float dt)
     {
-        m_parent->remove_component(this);
+        if (is_action_done())
+            m_parent->remove_component(this);
     }
     
     IMPLEMENT_TYPE_INFO(targeted_action)
     
-    targeted_action* targeted_action::create(action* act, game_object* target)
+    targeted_action::~targeted_action()
     {
-        auto action = ref::create<targeted_action>();
+
+    }
+    
+    bool targeted_action::init(action* action, game_object* target)
+    {
+        if (!action || !target)
+            return false;
         
-        action->m_action = act;
-        action->m_target = target;
+        m_action = action;
+        m_target = target;
         
-        return action;
+        return true;
     }
     
     void targeted_action::start()
     {
+        assert(m_parent);
         m_target->add_component(m_action);
-    }
-    
-    void targeted_action::update(float dt)
-    {
-        if (is_action_done())
-            done_action();
     }
     
     IMPLEMENT_TYPE_INFO(action_instant)
     
     void action_instant::start()
     {
-        handle_action();
-        m_handled = true;
-    }
-    
-    void action_instant::update(float dt)
-    {
-        if (is_action_done())
-            done_action();
+        m_handled = handle_action();
     }
     
     IMPLEMENT_TYPE_INFO(action_lua_callback)
     
-    action_lua_callback* action_lua_callback::create(lua_State* state, int handler)
+    action_lua_callback::~action_lua_callback()
     {
-        auto action = ref::create<action_lua_callback>();
-        
-        action->m_handler = handler;
-        action->m_state = state;
-        
-        return action;
+        scripting::clear_ref(m_state, m_handler);
     }
     
-    void action_lua_callback::handle_action()
+    bool action_lua_callback::init(lua_State* state, int handler)
+    {
+        if (!state)
+            return false;
+        
+        m_handler = handler;
+        m_state = state;
+        
+        return true;
+    }
+    
+    bool action_lua_callback::handle_action()
     {
         scripting::call_method(m_state, m_handler);
+        
+        return true;
     }
     
     void action_inverval::start()
@@ -80,18 +83,22 @@ namespace engine
             step(std::max(0.0f, std::min(m_time / m_duration, 1.0f)));
         }
         
-        if (is_action_done())
-            done_action();
+        action::update(dt);
     }
     
     IMPLEMENT_TYPE_INFO(action_sequence)
     
-    action_sequence* action_sequence::sequence(const vector<action*>& actions)
+    action_sequence::~action_sequence()
     {
-        auto action = ref::create<action_sequence>();
-        action->m_actions = actions;
+
+    }
+    
+    bool action_sequence::init(const vector<action*>& actions)
+    {
+        for (auto action : actions)
+            m_actions.push_back(action);
         
-        return action;
+        return true;
     }
     
     void action_sequence::append(action* action)
@@ -107,39 +114,38 @@ namespace engine
     
     void action_sequence::update(float dt)
     {
-        if (is_action_done())
+        auto& action = m_actions.at(m_current_action);
+        if (action->is_action_done())
         {
-            done_action();
+            ++m_current_action;
+            start_next_action();
         }
-        else
-        {
-            auto action = m_actions.at(m_current_action);
-            if (action->is_action_done())
-            {
-                ++m_current_action;
-                start_next_action();
-            }
-        }
+        
+        action::update(dt);
     }
     
     void action_sequence::start_next_action()
     {
         if (m_current_action < m_actions.size())
         {
-            auto action = m_actions.at(m_current_action);
+            auto& action = m_actions.at(m_current_action);
             m_parent->add_component(action);
         }
     }
     
     IMPLEMENT_TYPE_INFO(action_list)
     
-    action_list* action_list::list(const vector<action*>& actions)
+    action_list::~action_list()
     {
-        auto action = ref::create<action_list>();
+
+    }
+    
+    bool action_list::init(const vector<action*>& actions)
+    {
+        for (auto action : actions)
+            m_actions.push_back(action);
         
-        action->m_actions = actions;
-        
-        return action;
+        return true;
     }
     
     void action_list::append(action* action)
@@ -149,28 +155,33 @@ namespace engine
     
     void action_list::update(float dt)
     {
-        for (auto action : m_actions)
+        m_running_actions.lock([=]()
         {
-            if (action->is_action_done())
-                ++m_counter;
-        }
+            for (auto& action : m_running_actions)
+            {
+                if (action->is_action_done())
+                    m_running_actions.erase(action);
+            }
+        });
+        
+        action::update(dt);
     }
     
     void action_list::start()
     {
-        for (auto action : m_actions)
+        for (auto& action : m_actions)
+        {
             m_parent->add_component(action);
+            m_running_actions.push_back(action);
+        }
     }
     
     IMPLEMENT_TYPE_INFO(action_delay)
     
-    action_delay* action_delay::delay(float duration)
+    bool action_delay::init(float duration)
     {
-        auto action = ref::create<action_delay>();
-        
-        action->m_duration = duration;
-        
-        return action;
+        m_duration = duration;
+        return true;
     }
     
     IMPLEMENT_TYPE_INFO(action_move)
@@ -217,6 +228,8 @@ namespace engine
     
     void action_move::start()
     {
+        assert(m_parent);
+        
         if (m_use_target_location)
         {
             m_from = m_parent->get_position();

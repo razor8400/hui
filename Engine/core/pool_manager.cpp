@@ -30,7 +30,7 @@ namespace engine
     {
         m_pool.lock([this]()
         {
-            for (auto obj : m_pool)
+            for (auto& obj : m_pool)
             {
                 if (obj->counter() > 1)
                     continue;

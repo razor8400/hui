@@ -152,9 +152,6 @@
     <ClCompile Include="..\..\..\..\Engine\utils\logger.cpp">
       <Filter>engine\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Engine\platform\win32\platform.cpp">
-      <Filter>engine\platform\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Engine\core\input\touch_dispatcher.cpp">
       <Filter>engine\core\input</Filter>
     </ClCompile>
@@ -169,6 +166,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Engine\components\box_collider2d.cpp">
       <Filter>engine\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Engine\platform\win32\platform.cpp">
+      <Filter>engine\platform\window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Engine\2d\batch_sprite.cpp">
+      <Filter>engine\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Engine\resources\texture_atlas.cpp">
+      <Filter>engine\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Engine\resources\font_ttf.cpp">
+      <Filter>engine\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Engine\2d\label.cpp">
+      <Filter>engine\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Engine\utils\font_utils.cpp">
+      <Filter>engine\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +319,24 @@
     <ClInclude Include="..\..\..\..\Engine\components\box_collider2d.h">
       <Filter>engine\components</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Engine\utils\pointer.h">
+      <Filter>engine\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Engine\2d\batch_sprite.h">
+      <Filter>engine\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Engine\resources\texture_atlas.h">
+      <Filter>engine\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Engine\resources\font_ttf.h">
+      <Filter>engine\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Engine\2d\label.h">
+      <Filter>engine\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Engine\utils\font_utils.h">
+      <Filter>engine\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Engine\utils\vector.inl">
@@ -314,6 +347,9 @@
     </None>
     <None Include="..\..\..\..\Engine\scripting\scripting.inl">
       <Filter>engine\scripting</Filter>
+    </None>
+    <None Include="..\..\..\..\Engine\utils\pointer.inl">
+      <Filter>engine\utils</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -5,6 +5,11 @@
 
 namespace math
 {
+	rect::rect()
+	{
+
+	}
+
 	rect::rect(float x, float y, float w, float h) : m_origin(x, y), m_size(w, h)
 	{
 
@@ -30,7 +35,7 @@ namespace math
 
 	vector2d rect::top_left() const
 	{
-		return m_origin + vector2d(0, m_size.y);
+		return m_origin + vector2d(0.0f, m_size.y);
 	}
 
 	vector2d rect::top_right() const
@@ -40,7 +45,7 @@ namespace math
 
 	vector2d rect::bottom_right() const
 	{
-		return m_origin + vector2d(m_size.x, 0);
+		return m_origin + vector2d(m_size.x, 0.0f);
 	}
 
 	vector2d rect::center() const

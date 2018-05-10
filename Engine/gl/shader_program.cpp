@@ -4,7 +4,10 @@
 namespace gl
 {
     const char* shader_program::shader_position_color = "shader_position_color";
+    const char* shader_program::shader_texture_position = "shader_texture_position";
     const char* shader_program::shader_texture_position_color = "shader_texture_position_color";
+    const char* shader_program::shader_texture_position_color_alpha = "shader_texture_position_color_alpha";
+	const char* shader_program::shader_font_position_color_alpha = "shader_font_position_color_alpha";
     
     shader_program::shader_program(GLuint program_id) : m_program_id(program_id)
     {
@@ -21,7 +24,7 @@ namespace gl
         
     }
     
-    void shader_position_color::use(const math::mat4& transform, const math::vector4d& color)
+    void shader_position_color::use(const math::mat4& transform)
     {
         GLuint matrix = glGetUniformLocation(m_program_id, shaders::mvp);
         
@@ -34,17 +37,13 @@ namespace gl
         
     }
     
-    void shader_texture_position_color::use(const math::mat4& transform, const math::vector4d& color)
+    void shader_texture_position_color::use(const math::mat4& transform)
     {
         GLuint matrix = glGetUniformLocation(m_program_id, shaders::mvp);
         GLuint texture  = glGetUniformLocation(m_program_id, shaders::texture_sampler2d);
-        GLuint tint = glGetUniformLocation(m_program_id, shaders::tint);
         
         glUseProgram(m_program_id);
-        
-        glUniform4f(tint, color.x, color.y, color.z, color.w);
         glUniformMatrix4fv(matrix, 1, GL_FALSE, &transform[0]);
-        
         glUniform1i(texture, 0);
     }
 }

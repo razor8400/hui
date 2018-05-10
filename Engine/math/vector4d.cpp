@@ -51,5 +51,15 @@ namespace math
         
         return result;
     }
+
+	bool vector4d::operator==(const vector4d & v4) const
+	{
+		return x == v4.x && y == v4.y && z == v4.z && w == v4.w;
+	}
+
+	bool vector4d::operator!=(const vector4d & v4) const
+	{
+		return !(*this == v4);
+	}
 }
 

@@ -144,7 +144,7 @@ function match3match_handler:match(field, match, x, y)
 	return nil
 end
 
-function match3match_handler:check_match(field, x, y)
+function match3match_handler:find_match(field, x, y)
 	for k, v in pairs(self.matches) do
 		for i = 0, v.height - 1 do
 			for j = 0, v.width - 1 do
@@ -163,13 +163,31 @@ function match3match_handler:check_match(field, x, y)
 	return nil
 end
 
+local function check_match(match, matches)
+	if not match then
+		return false
+	end
+
+	for k, v in pairs(matches) do
+		for k1, v1 in pairs(match) do
+			for k2, v2 in pairs(v) do
+				if v1 == v2 then
+					return false
+				end
+			end
+		end
+	end
+
+	return true
+end
+
 function match3match_handler:find_matches(field, find_callback, finish_callback)
 	self.thread = coroutine.create(function()
 		for y = 1, field.rows do
 			local matches = {}
 			for x = 1, field.colls do
-				local match = self:check_match(field, x, y)
-				if match then
+				local match = self:find_match(field, x, y)
+				if check_match(match, matches) then
 					table.insert(matches, match)
 				end
 			end

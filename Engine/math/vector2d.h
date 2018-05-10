@@ -9,6 +9,7 @@ namespace math
         
         vector2d();
         vector2d(float x, float y);
+		vector2d(int x, int y);
 
         bool operator==(const vector2d& other) const;
         bool operator!=(const vector2d& other) const;

@@ -81,16 +81,19 @@ namespace engine
     
     void director::main_loop()
     {
+        auto errors = gl::get_errors();
+        
+        for (auto error : errors)
+            logger() << "[gl] " << error;
+        
+        gl::clear_errors();
+        
         if (m_next_scene)
         {
             if (m_scene)
-            {
                 m_scene->on_exit();
-                m_scene->release();
-            }
             
             m_scene = m_next_scene;
-            m_scene->retain();
             m_scene->on_enter();
             
             m_next_scene = nullptr;
@@ -133,5 +136,10 @@ namespace engine
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
 
         return ms.count();
+    }
+    
+    const math::mat4& director::get_world() const
+    {
+        return m_renderer->get_world();
     }
 }

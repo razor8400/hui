@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ref.h"
+#include "utils/pointer.h"
 
 namespace engine
 {
@@ -12,34 +13,36 @@ namespace engine
         template<class T, class ...Args>
         static T* create(Args... args);
         
+        ~game_object();
+        
 		virtual bool init();
 
 		virtual void update(float dt);
-		virtual void draw(const math::mat4& world);
-        virtual void render(const math::mat4& world);
+		virtual void draw(const math::mat4& t);
+        virtual void render(const math::mat4& t);
         
         virtual void on_enter();
         virtual void on_exit();
     public:
-        void add_child(game_object* obj);
-        void remove_child(game_object* obj);
-		void remove_from_parent();
+        virtual void add_child(game_object* obj);
+        virtual void remove_child(game_object* obj);
+		virtual void remove_from_parent();
         
-        void add_component(component* component);
-        void remove_component(component* component);
+        virtual void add_component(component* component);
+        virtual void remove_component(component* component);
         
         math::vector3d anchor_point() const { return m_anchor * m_size; }
         math::vector3d global_to_local(const math::vector3d& v3) const;
         math::vector3d local_to_global(const math::vector3d& v3) const;
 		
         const math::mat4& get_transform() const { return m_transform; }
-    private:
-        void mark_dirty() { m_update_transform = true; }
-        
+	protected:
         math::mat4 transform(const math::mat4& parent) const;
         
         math::mat4 parent_transform() const;
         math::mat4 world_transform() const;
+
+		void mark_dirty() { m_update_transform = true; }
     public:
         void set_enabled(bool enabled) { m_enabled = enabled; }
         bool get_enabled() const { return m_enabled; }
@@ -72,8 +75,8 @@ namespace engine
         void set_shader_program(const gl::shader_program_ptr& shader_program) { m_shader_program = shader_program; }
         const gl::shader_program_ptr& get_shader_program() const { return m_shader_program; }
 	protected:
-        engine::vector<game_object*> m_children;
-        engine::vector<component*> m_components;
+        engine::vector<pointer<game_object>> m_children;
+        engine::vector<pointer<component>> m_components;
         
 		math::vector3d m_position;
 		math::vector3d m_rotation;

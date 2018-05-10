@@ -2,15 +2,6 @@
 #include "scripting.h"
 #include "binding.h"
 
-#include "components/component.h"
-#include "components/box_collider2d.h"
-#include "components/action.h"
-
-#include "core/game_object.h"
-#include "core/scene.h"
-
-#include "2d/sprite.h"
-
 namespace engine
 {
     namespace scripting
@@ -51,11 +42,11 @@ namespace engine
         {
             register_class<engine::game_object>(state, scripting::game_object::functions);
             register_class<engine::sprite>(state, scripting::sprite::functions);
+			register_class<engine::batch_sprite>(state, scripting::batch_sprite::functions);
             register_class<engine::scene>(state, scripting::scene::functions);
             
             register_class<engine::box_collider2d>(state, scripting::box_collider2d::functions);
             
-            register_class<engine::action>(state, scripting::action::functions);
             register_class<engine::targeted_action>(state, scripting::targeted_action::functions);
             register_class<engine::action_lua_callback>(state, scripting::action_lua_callback::functions);
             register_class<engine::action_sequence>(state, scripting::action_sequence::functions);
@@ -92,11 +83,17 @@ namespace engine
 			return true;
         }
         
+        void clear_ref(lua_State* state, int handler)
+        {
+            luaL_unref(state, LUA_REGISTRYINDEX, handler);
+        }
+        
         void call_method(lua_State* state, int handler)
         {
             lua_rawgeti(state, LUA_REGISTRYINDEX, handler);
             if (lua_pcall(state, 0, 0, 0))
                 logger() << "[scripting] call_method error:" << lua_tostring(state, -1);
+            
         }
         
         void call_method(lua_State* state, const std::string& class_name, const std::string& method)

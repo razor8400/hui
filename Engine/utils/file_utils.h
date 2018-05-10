@@ -14,5 +14,13 @@ namespace engine
         bool read_resource_file(const std::string& file_name, std::vector<char>* buffer);
 		bool read_file(const std::string& file_name, unsigned char** data, size_t* size);
         bool read_file(const std::string& file_name, std::vector<char>* buffer);
+
+		struct file_data
+		{
+			unsigned char* buffer = nullptr;
+			size_t size = 0;
+
+			~file_data();
+		};
 	};
 }

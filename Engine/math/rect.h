@@ -8,6 +8,7 @@ namespace math
 	class rect
 	{
 	public:
+		rect();
 		rect(float x, float y, float w, float h);
 		rect(const vector2d& origin, const vector2d& size);
 
@@ -22,6 +23,9 @@ namespace math
 		rect operator*(const float s) const;
 		rect operator*(const vector2d& s) const;
 		rect operator*(const mat4& m4) const;
+
+		const vector2d& get_origin() const { return m_origin; }
+		const vector2d& get_size() const { return m_size; }
 	private:
 		vector2d m_origin;
 		vector2d m_size;

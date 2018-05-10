@@ -53,9 +53,9 @@ namespace engine
         auto transform = m_parent->get_transform();
         
         auto p1 = math::transform_point(math::vector2d::zero, transform);
-        auto p2 = math::transform_point(math::vector2d(m_size.x, 0), transform);
+        auto p2 = math::transform_point(math::vector2d(m_size.x, 0.0f), transform);
         auto p3 = math::transform_point(m_size, transform);
-        auto p4 = math::transform_point(math::vector2d(0, m_size.y), transform);
+        auto p4 = math::transform_point(math::vector2d(0.0f, m_size.y), transform);
         
         m_vertices.clear();
         m_vertices.push_back(p1);

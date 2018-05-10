@@ -17,6 +17,14 @@ local config = {
 	},
 	{
 		match = {
+			1, 1, 1, 1, 1
+		},
+		rotations = 2,
+		width = 5,
+		height = 1
+	},
+	{
+		match = {
 			1, 1,
 			1, 1
 		},

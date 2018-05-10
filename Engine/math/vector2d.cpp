@@ -14,6 +14,12 @@ namespace math
 
 	}
 
+	vector2d::vector2d(int x1, int y1) : x((float)x1), y((float)y1)
+	{
+
+	}
+
+
 	bool vector2d::operator==(const vector2d& other) const
 	{
 		return other.x == x && other.y == y;

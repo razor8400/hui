@@ -104,5 +104,11 @@ namespace engine
             
             return file;
         }
-    }
+
+		file_data::~file_data()
+		{
+			if (buffer)
+				delete[] buffer;
+		}
+	}
 }

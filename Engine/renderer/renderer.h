@@ -14,6 +14,8 @@ namespace engine
 		void set_camera_position(const math::vector3d& position);
 		void draw_scene(scene* scene);
 		void dump_camera_settings();
+        
+        const math::mat4& get_world() const { return m_world; }
 	private:
 		void update_world();
 	private:

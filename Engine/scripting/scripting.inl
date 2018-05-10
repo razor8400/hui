@@ -2,8 +2,7 @@
 
 #include "scripting.h"
 #include "binding.h"
-
-#include "core/game_object.h"
+#include "engine.h"
 
 namespace engine
 {

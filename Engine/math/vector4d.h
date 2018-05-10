@@ -19,6 +19,9 @@ namespace math
 		vector4d operator/(float number) const;
         vector4d operator*(const mat4& m4) const;
 
+		bool operator==(const vector4d& v4) const;
+		bool operator!=(const vector4d& v4) const;
+
 		static const vector4d one;
 		static const vector4d zero;
 	};

@@ -11,8 +11,8 @@ local match3element_loader = {
 
 }
 
-function match3element_loader:load_element(element)
-	local view = sprite.create(content[element.element_type])
+function match3element_loader:load_element(atlas, element)
+	local view = sprite.create(atlas, content[element.element_type])
 	element.view = view
 	return view
 end

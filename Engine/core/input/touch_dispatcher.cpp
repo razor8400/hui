@@ -17,7 +17,7 @@ namespace engine
     
     touch_dispatcher::~touch_dispatcher()
     {
-        
+
     }
     
     void touch_dispatcher::add_touch_listener(touch_listener* listener)
@@ -36,7 +36,7 @@ namespace engine
     
     void touch_dispatcher::on_touch_began()
     {
-        for (auto listener : m_listeners)
+        for (auto& listener : m_listeners)
         {
             if (listener->on_touch_began())
             {
@@ -50,13 +50,13 @@ namespace engine
     
     void touch_dispatcher::on_touch_moved()
     {
-        for (auto listener : m_active_listeners)
+        for (auto& listener : m_active_listeners)
             listener->on_touch_moved();
     }
     
     void touch_dispatcher::on_touch_ended()
     {
-        for (auto listener : m_active_listeners)
+        for (auto& listener : m_active_listeners)
             listener->on_touch_ended();
         
         m_active_listeners.clear();

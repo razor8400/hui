@@ -1,28 +1,46 @@
 #pragma once
 
-#include "core/game_object.h"
+#include "texture_protocol.h"
 
 namespace engine
-{    
-    class sprite : public game_object
+{
+    class sprite : public texture_protocol
     {
+        struct quad
+        {
+            std::vector<math::vector2d> vertices;
+            std::vector<math::vector2d> uv;
+            std::vector<math::vector4d> colors;
+        };
+        
         DECLARE_CLASS;
     public:
         bool init() override;
         bool init(const std::string& file_name);
-        bool init(const texture2d_ptr& texture);
-        void render(const math::mat4& world) override;
+		bool init(const texture2d_ptr& texture);
+        bool init(const texture2d_ptr& texture, const math::rect& rect);
+		bool init(const std::string& atlas_name, const std::string& file_name);
 
+		void draw(const math::mat4& t) override;
+        void render(const math::mat4& t) override;
+
+		void clear_texture();
         void set_texture(const std::string& file_name);
         void set_texture(const texture2d_ptr& texture);
+        void set_texture(const texture2d_ptr& texture, const math::rect& rect);
+		
+        const texture2d_ptr& get_texture() const { return m_texture; }
 
-        void set_color(const math::vector3d& color) { m_color = color; }
-        const math::vector3d& get_color() const { return m_color; }
-        
-        void set_alpha(float alpha);
-        float get_alpha() const;
-    private:
+		const math::rect& get_texture_rect() const { return m_texture_rect; }
+		void set_texture_rect(const math::rect& texture_rect) { m_texture_rect = texture_rect; }
+
+		quad update_quad() const;
+    protected:
         texture2d_ptr m_texture;
-        math::vector3d m_color = math::vector3d::one;
+		math::rect m_texture_rect;
+
+		bool m_rotated = false;
+
+		quad m_quad;
     };
 }

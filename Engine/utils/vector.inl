@@ -16,16 +16,14 @@ namespace engine
     }
     
     template<class T>
-    void vector<T>::push_back(T obj)
+    void vector<T>::push_back(const T& obj)
     {
-        obj->retain();
-        
         m_push.push_back(obj);
         update();
     }
 
     template<class T>
-    void vector<T>::erase(T obj)
+    void vector<T>::erase(const T& obj)
     {
         m_erase.push_back(obj);
         update();
@@ -50,8 +48,6 @@ namespace engine
         for (auto obj : m_erase)
         {
             auto it = std::find(this->begin(), this->end(), obj);
-            
-            obj->release();
             
             if (it != this->end())
                 base_class::erase(it);

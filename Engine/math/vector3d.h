@@ -18,6 +18,9 @@ namespace math
 
         vector3d operator*(float number) const;
         vector3d operator/(float number) const;
+		
+		bool operator==(const vector3d& v4) const;
+		bool operator!=(const vector3d& v4) const;
         
         float lenght() const;
 

@@ -26,11 +26,17 @@ namespace gl
 
     void shaders_manager::compile_default_shaders()
     {
-        auto position_color = create_gl_program<shader_position_color>(shaders::shader_position, shaders::shader_color);
-        auto shader_position_texture_color = create_gl_program<shader_texture_position_color>(shaders::shader_texture_position, shaders::shader_texture_color);
+        auto position_color = create_gl_program<shader_position_color>(shaders::shader_position_color_vert, shaders::shader_position_color_frag);
+        auto shader_position_texture = create_gl_program<shader_texture_position_color>(shaders::shader_texture_position_vert, shaders::shader_texture_position_frag);
+        auto shader_position_texture_color = create_gl_program<shader_texture_position_color>(shaders::shader_texture_position_color_vert, shaders::shader_texture_position_color_frag);
+        auto shader_position_texture_color_alpha = create_gl_program<shader_texture_position_color>(shaders::shader_texture_position_color_alpha_vert, shaders::shader_texture_position_color_alpha_frag);
+		auto shader_position_font_color_alpha = create_gl_program<shader_texture_position_color>(shaders::shader_texture_position_color_alpha_vert, shaders::shader_font_position_color_alpha_frag);
 
         add_to_cache(position_color, shader_program::shader_position_color);
+        add_to_cache(shader_position_texture, shader_program::shader_texture_position);
         add_to_cache(shader_position_texture_color, shader_program::shader_texture_position_color);
+        add_to_cache(shader_position_texture_color_alpha, shader_program::shader_texture_position_color_alpha);
+		add_to_cache(shader_position_font_color_alpha, shader_program::shader_font_position_color_alpha);
     }
 
     void shaders_manager::add_to_cache(const shader_program_ptr& program, const std::string& key)

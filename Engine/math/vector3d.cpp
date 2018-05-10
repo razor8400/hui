@@ -50,6 +50,16 @@ namespace math
     {
         return vector3d(x / number, y / number, z / number);
     }
+
+	bool vector3d::operator==(const vector3d & v3) const
+	{
+		return x == v3.x && y == v3.y && z == v3.z;
+	}
+
+	bool vector3d::operator!=(const vector3d & v4) const
+	{
+		return !(*this == v4);
+	}
     
     float vector3d::lenght() const
     {

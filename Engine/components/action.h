@@ -10,24 +10,38 @@ namespace engine
     {
         DECLARE_CLASS
     public:
-        virtual void stop() {};
+        virtual void update(float dt) override;
+        virtual void stop() override {};
         virtual bool is_action_done() const = 0;
-    protected:
-        virtual void done_action();
+        
+        template<class T, class ...Args>
+        static T* create(Args... args);
     };
+    
+    template<class T, class ...Args>
+    T* action::create(Args... args)
+    {
+        auto action = ref::create<T>();
+        
+        if (action->init(args...))
+            return action;
+        
+        return nullptr;
+    }
     
     class targeted_action : public action
     {
         DECLARE_CLASS
     public:
-        static targeted_action* create(action* action, game_object* target);
+        bool init(action* action, game_object* target);
+        
+        ~targeted_action();
         
         void start() override;
-        void update(float dt) override;
         
         bool is_action_done() const override { return m_action->is_action_done(); }
     private:
-        action* m_action = nullptr;
+        pointer<action> m_action = nullptr;
         game_object* m_target = nullptr;
     };
     
@@ -36,11 +50,10 @@ namespace engine
         DECLARE_CLASS
     public:
         void start() override;
-        void update(float dt) override;
         
         bool is_action_done() const override { return m_handled; }
     protected:
-        virtual void handle_action() = 0;
+        virtual bool handle_action() = 0;
     private:
         bool m_handled = false;
     };
@@ -49,8 +62,10 @@ namespace engine
     {
         DECLARE_CLASS
     public:
-        static action_lua_callback* create(lua_State* state, int handler);
-        void handle_action() override;
+        ~action_lua_callback();
+        
+        bool init(lua_State* state, int handler);
+        bool handle_action() override;
     private:
         lua_State* m_state;
         int m_handler;
@@ -76,7 +91,10 @@ namespace engine
     {
         DECLARE_CLASS
     public:
-        static action_sequence* sequence(const vector<action*>& actions);
+        ~action_sequence();
+        
+        bool init() { return true; }
+        bool init(const vector<action*>& actions);
         
         void append(action* action);
         void update(float dt) override;
@@ -86,7 +104,7 @@ namespace engine
         void start() override;
         void start_next_action();
     private:
-        vector<action*> m_actions;
+        vector<pointer<action>> m_actions;
         size_t m_current_action = 0;
     };
     
@@ -94,24 +112,27 @@ namespace engine
     {
         DECLARE_CLASS
     public:
-        static action_list* list(const vector<action*>& actions);
+        ~action_list();
+        
+        bool init() { return true; }
+        bool init(const vector<action*>& actions);
         
         void append(action* action);
         void update(float dt) override;
         
-        bool is_action_done() const override { return m_counter >= m_actions.size(); }
+        bool is_action_done() const override { return m_running_actions.empty(); }
     private:
         void start() override;
     private:
-        vector<action*> m_actions;
-        size_t m_counter = 0;
+        vector<pointer<action>> m_actions;
+        vector<pointer<action>> m_running_actions;
     };
     
     class action_delay : public action_inverval
     {
         DECLARE_CLASS
     public:
-        static action_delay* delay(float duration);
+        bool init(float duration);
     private:
         void step(float s) {};
     };

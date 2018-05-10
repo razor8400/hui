@@ -43,14 +43,29 @@ namespace engine
         return m_texture_id != texture_default_id;
     }
     
-    void texture2d::draw(const math::mat4& transform, const gl::shader_program_ptr& shader_program)
+    void texture2d::draw(const math::mat4& t)
     {
         gl::bind_texture(m_texture_id);
-        gl::set_blend_func(m_blend_func.source, m_blend_func.destination);
         
-        if (shader_program)
-            shader_program->use(transform, m_color);
+        auto program = gl::shaders_manager::instance().get_program(gl::shader_program::shader_texture_position);
         
-        gl::draw_texture2d(0, 0, (float)m_width, (float)m_height);
+        if (program)
+            program->use(t);
+        
+        std::vector<math::vector2d> vertices = {
+            { 0, 0 },
+            { m_width, 0 },
+            { m_width, m_height },
+            { 0, m_height }
+        };
+        
+        std::vector<math::vector2d> text_coords = {
+            { 0, 1 },
+            { 1, 1 },
+            { 1, 0 },
+            { 0, 0 }
+        };
+        
+        gl::draw_texture2d(vertices, text_coords);
     }
 }

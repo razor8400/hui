@@ -2,8 +2,8 @@ local match3cell = load_script('scripts/match3/match3cell.lua')
 local match3generator = load_script('scripts/match3/match3generator.lua')
 local match3match = load_script('scripts/match3/match3match.lua')
 
-local event_generate = {
-
+event_generate = {
+	event = "generate"
 }
 
 event_generate.new = function(element, x, y)
@@ -13,23 +13,27 @@ event_generate.new = function(element, x, y)
 		y = y
 	}
 
+	setmetatable(e, { __index = event_generate })
+
 	return e
 end
 
-local event_destroy = {
-
+event_destroy = {
+	event = "destroy"
 }
 
 event_destroy.new = function(element)
 	local e = {
 		element = element
 	}
+
+	setmetatable(e, { __index = event_destroy })
 	
 	return e
 end
 
-local event_drop = {
-
+event_drop = {
+	event = "drop"
 }
 
 event_drop.new = function(tick, element)
@@ -37,6 +41,8 @@ event_drop.new = function(tick, element)
 		tick = tick,
 		element = element
 	}
+
+	setmetatable(e, { __index = event_drop })
 
 	return e
 end
@@ -91,7 +97,7 @@ function match3field:generate_element(x, y)
 		end
 		element = assert(match3generator:generate_element())
 		cell:add_element(element)
-	until match3match:check_match(self, cell.x, cell.y) == nil
+	until match3match:find_match(self, cell.x, cell.y) == nil
 
 	return element
 end
@@ -102,7 +108,7 @@ function match3field:generate_field()
 	for x = self.colls, 1, -1 do
 		for y = self.rows, 1, -1 do
 			local element = self:generate_element(x, y)
-			table.insert(self.generate_events, event_generate.new(element, x, y))
+			self:add_event(event_generate.new(element, x, y))
 		end
 	end
 
@@ -127,7 +133,7 @@ function match3field:swipe(a, b)
 	if el1 and el2 then
 		do_swipe(el1, el2)
 
-		if match3match:check_match(self, a.x, a.y) ~= nil or match3match:check_match(self, b.x, b.y) ~= nil then
+		if match3match:find_match(self, a.x, a.y) ~= nil or match3match:find_match(self, b.x, b.y) ~= nil then
 			return true
 		end
 
@@ -136,46 +142,38 @@ function match3field:swipe(a, b)
 	return false
 end
 
-function match3field:events_count()
-	return #self.generate_events + #self.destroy_events + #self.drop_events
+function match3field:add_event(e)
+	table.insert(self.events, e)
 end
 
-function match3field:process()
-	local find_matches = 0
-	local find_finished = false
+function match3field:events_count()
+	return #self.events
+end
 
-	local find_callback = function(matches)
-		for k, v in pairs(matches) do
-			for k1, v1 in pairs(v) do
-				v1:remove_from_cell()
-				
-				table.insert(self.destroy_events, event_destroy.new(v1))
-			end
+function update_field(field)
+	local tick = 1
+
+	function drop_element(element, x, y)
+		if #element.path == 0 then
+			field:add_event(event_drop.new(tick, element))
 		end
-
-		find_matches = find_matches + #matches
+		
+		table.insert(element.path, { x = x, y = y })
+		field.field_changed = true
 	end
 
-	local finish_callback = function()
-		local tick = 1
+	repeat
+		local generate_elements = false
 
-		function drop_element(element, x, y)
-			if #element.path == 0 then
-				table.insert(self.drop_events, event_drop.new(tick, element))
-			end
-	
-			table.insert(element.path, { x = x, y = y })
-		end
-	
 		repeat
 			local drop_elements = false
 
-			for x = 1, self.colls do
-				for y = 1, self.rows - 1 do
-					local cell = assert(self:get_cell(x, y))
+			for x = 1, field.colls do
+				for y = 1, field.rows - 1 do
+					local cell = assert(field:get_cell(x, y))
 	
 					if cell:get_element_at(element_layer.gameplay) == nil then
-						local top = assert(self:get_cell(x, y + 1))
+						local top = assert(field:get_cell(x, y + 1))
 						local element = top:get_element_at(element_layer.gameplay)
 	
 						if element and element.droppable then
@@ -186,77 +184,81 @@ function match3field:process()
 					end
 				end
 			end
-	
-			for x = 1, self.colls do
-				for y = 1, self.rows do
-					local cell = assert(self:get_cell(x, y))
-					if cell:get_element_at(element_layer.gameplay) == nil and cell.generate_elements then
-						local element = self:generate_element(x, y)
-	
-						table.insert(self.generate_events, event_generate.new(element, x, y + 1))
-						drop_element(element, x, y)
-					end
-				end
-			end
-	
-			tick = tick + 1
 		until not drop_elements
 
-		self.send_events = true
+		for x = 1, field.colls do
+			for y = 1, field.rows do
+				local cell = assert(field:get_cell(x, y))
+				if cell:get_element_at(element_layer.gameplay) == nil and cell.generate_elements then
+					local element = field:generate_element(x, y)
 
-		find_finished = true
+					generate_elements = true
+
+					field:add_event(event_generate.new(element, x, y + 1))
+					drop_element(element, x, y)
+				end
+			end
+		end
+
+		tick = tick + 1
+		coroutine.yield()
+	until not generate_elements
+
+	field.send_events = true
+end
+
+function match3field:process()
+	self.field_changed = false
+
+	local find_callback = function(matches)
+		for k, v in pairs(matches) do
+			for k1, v1 in pairs(v) do
+				v1:remove_from_cell()
+				
+				self:add_event(event_destroy.new(v1))
+			end
+		end
+		
+		self.field_changed = #matches > 0	
 	end
 
-	self.thread = coroutine.create(function()
-		local find_started = false
+	local finish_callback = function()
+		self.update_thread = coroutine.create(update_field)
+	end
 
+	self.process_thread = coroutine.create(function()
 		repeat
-			if not find_started then
-				find_started = true
-				find_matches = 0
-				match3match:find_matches(self, find_callback, finish_callback)
-			end
+			self.field_changed = false
+			match3match:find_matches(self, find_callback, finish_callback)
 
 			coroutine.yield()
+		until not self.field_changed
 
-			if find_finished and find_matches > 0 then
-				find_started = false
-				find_finished = false
-			end
-		until find_finished and self:events_count() == 0
-
-		self.thread = nil
+		self.process_thread = nil
 	end)
+	
+	coroutine.resume(self.process_thread)
 end
 
 function match3field:update()
 	match3match:update()
 
-	if self.thread then
-		coroutine.resume(self.thread)
+	if self.update_thread then
+		coroutine.resume(self.update_thread, self)
 	end
 
 	if self.send_events then
 		if self.delegate then
-			for k, v in pairs(self.destroy_events) do
-				self.delegate:on_destroy_element(v)
-			end
-
-			for k, v in pairs(self.generate_events) do
-				self.delegate:on_generate_element(v)
-			end
-	
-			for k, v in pairs(self.drop_events) do
-				self.delegate:on_drop_element(v)
-			end
-
-			self.delegate:handle_events()
+			self.delegate:handle_events(self.events)
 		end
 
 		self.send_events = false
-		self.drop_events = {}
-		self.generate_events = {}
-		self.destroy_events = {}
+		self.events = {}
+		self.update_thread = nil
+
+		if self.process_thread then
+			coroutine.resume(self.process_thread)
+		end
 	end
 end
 
@@ -269,9 +271,7 @@ function match3field.new(colls, rows, cell)
 	field.rows = rows
 	field.cell = cell
 	field.cells = {}
-	field.destroy_events = {}
-	field.generate_events = {}
-	field.drop_events = {}
+	field.events = {}
 	field.send_events = false
 	
 	setmetatable(field, { __index = match3field })

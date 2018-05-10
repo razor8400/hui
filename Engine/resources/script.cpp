@@ -7,24 +7,20 @@ namespace engine
 {
     std::shared_ptr<script> script::load_from_file(const std::string& file_name)
     {
-        unsigned char* buffer;
-        size_t size;
+		auto data = file_utils::file_data();
 		
 		logger() << "[script] load:" << file_name;
 
-        if (file_utils::read_file(file_name, &buffer, &size))
+        if (file_utils::read_file(file_name, &data.buffer, &data.size))
         {
             auto name = file_utils::get_file_name(file_name);
             auto lua = std::make_shared<script>(name);
 
-            if (lua->load(buffer, size))
-            {
-                delete [] buffer;
+            if (lua->load(data.buffer, data.size))
                 return lua;
-            }
         }
 
-        logger() << "[script] load error:can't read file:" << file_name;
+        logger() << "[script] load error:" << file_name;
                 
         return std::shared_ptr<script>();
     }

@@ -124,10 +124,12 @@ namespace engine
             int set_texture(lua_State* L);
             int set_alpha(lua_State* L);
             int get_alpha(lua_State* L);
+            int destroy(lua_State* L);
             
             static const luaL_Reg functions[] =
             {
                 { "create", create },
+                { "__gc", destroy },
                 { "set_color", set_color },
                 { "get_color", get_color },
                 { "set_texture", set_texture },
@@ -136,6 +138,19 @@ namespace engine
                 { NULL, NULL }
             };
         }
+
+		namespace batch_sprite
+		{
+			int create(lua_State* L);
+			int destroy(lua_State* L);
+
+			static const luaL_Reg functions[] =
+			{
+				{ "create", create },
+				{ "__gc", destroy },
+				{ NULL, NULL }
+			};
+		}
         
         namespace scene
         {
@@ -163,24 +178,15 @@ namespace engine
             };
         }
         
-        namespace action
+        namespace targeted_action
         {
+            int create(lua_State* L);
             int destroy(lua_State* L);
             
             static const luaL_Reg functions[] =
             {
-                { "__gc", destroy },
-                { NULL, NULL }
-            };
-        }
-        
-        namespace targeted_action
-        {
-            int create(lua_State* L);
-            
-            static const luaL_Reg functions[] =
-            {
                 { "create", create },
+                { "__gc", destroy },
                 { NULL, NULL }
             };
         }
@@ -188,10 +194,12 @@ namespace engine
         namespace action_lua_callback
         {
             int create(lua_State* L);
+            int destroy(lua_State* L);
             
             static const luaL_Reg functions[] =
             {
                 { "create", create },
+                { "__gc", destroy },
                 { NULL, NULL }
             };
         }
@@ -206,6 +214,7 @@ namespace engine
             {
                 { "create", create },
                 { "append", append },
+                { "__gc", destroy },
                 { NULL, NULL }
             };
         }
@@ -220,6 +229,7 @@ namespace engine
             {
                 { "create", create },
                 { "append", append },
+                { "__gc", destroy },
                 { NULL, NULL }
             };
         }
@@ -227,10 +237,12 @@ namespace engine
         namespace action_delay
         {
             int create(lua_State* L);
+            int destroy(lua_State* L);
             
             static const luaL_Reg functions[] =
             {
                 { "create", create },
+                { "__gc", destroy },
                 { NULL, NULL }
             };
         }
@@ -247,6 +259,7 @@ namespace engine
                 { "create", create },
                 { "move_to", move_to },
                 { "move_by", move_by },
+                { "__gc", destroy },
                 { NULL, NULL }
             };
         }

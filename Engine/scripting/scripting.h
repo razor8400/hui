@@ -23,6 +23,8 @@ namespace engine
         void register_objects(lua_State* state);
         void register_functions(lua_State* state);
         
+        void clear_ref(lua_State* state, int handler);
+        
         bool load_script(lua_State* state, const char* buffer, size_t size, const std::string& name);
         
         void call_method(lua_State* state, int handler);
@@ -40,5 +42,4 @@ namespace engine
     }
 }
 
-#include "scripting.inl"
 
