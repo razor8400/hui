@@ -44,8 +44,10 @@ namespace engine
 			if (!obj->get_enabled())
 				continue;
 
+            obj->update_color();
+            
 			auto transform = obj->get_transform();
-			auto quad = obj->update_quad();
+			auto quad = obj->quad();
 
 			for (auto& vertice : quad.vertices)
 				vertice = math::transform_point(vertice, transform);

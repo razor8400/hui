@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <numeric>
 #include <functional>
 #include <queue>
 #include <cstdarg>
@@ -25,6 +26,10 @@ namespace engine
 {
     class ref;
     class renderer;
+    
+    class sprite;
+    class label;
+    class batch_sprite;
     
 	class scene;
 	class game_object;

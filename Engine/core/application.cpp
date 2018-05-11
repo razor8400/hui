@@ -48,6 +48,8 @@ namespace engine
     {
         logger() << "[application] application enter background";
         
+        director::instance().on_lost_focus();
+        
         if (m_delegate)
             m_delegate->application_enter_background(this);
     }
@@ -55,6 +57,8 @@ namespace engine
     void application::on_enter_foreground()
     {
         logger() << "[application] application enter foreground";
+        
+        director::instance().on_focus();
         
         if (m_delegate)
             m_delegate->application_enter_foreground(this);

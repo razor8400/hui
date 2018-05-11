@@ -94,8 +94,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>call "$(SolutionDir)Scripts\copy_resources.bat"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,6 +143,7 @@
     <ClCompile Include="..\..\..\..\Engine\2d\batch_sprite.cpp" />
     <ClCompile Include="..\..\..\..\Engine\2d\label.cpp" />
     <ClCompile Include="..\..\..\..\Engine\2d\sprite.cpp" />
+    <ClCompile Include="..\..\..\..\Engine\2d\texture_protocol.cpp" />
     <ClCompile Include="..\..\..\..\Engine\components\action.cpp" />
     <ClCompile Include="..\..\..\..\Engine\components\box_collider2d.cpp" />
     <ClCompile Include="..\..\..\..\Engine\components\scriptable_component.cpp" />
@@ -215,6 +215,7 @@
     <ClInclude Include="..\..\..\..\Engine\2d\batch_sprite.h" />
     <ClInclude Include="..\..\..\..\Engine\2d\label.h" />
     <ClInclude Include="..\..\..\..\Engine\2d\sprite.h" />
+    <ClInclude Include="..\..\..\..\Engine\2d\texture_protocol.h" />
     <ClInclude Include="..\..\..\..\Engine\common.h" />
     <ClInclude Include="..\..\..\..\Engine\components\action.h" />
     <ClInclude Include="..\..\..\..\Engine\components\box_collider2d.h" />

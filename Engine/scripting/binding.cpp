@@ -870,13 +870,23 @@ namespace engine
                 if (!lua_isfunction(L,1))
                     luaL_argerror(L, 1, "expected function");
                 
-                lua_pushvalue(L, -1);
-                auto handler = luaL_ref(L, LUA_REGISTRYINDEX);
-                auto action = action::create<engine::action_lua_callback>(L, handler);
+				auto scripts = resources_manager::instance().get_resources<engine::script>();
 
-                push_ref(L, action);
+				for (auto script : scripts)
+				{
+					if (script->get_state() == L)
+					{
+						lua_pushvalue(L, -1);
+						auto handler = luaL_ref(L, LUA_REGISTRYINDEX);
+						auto action = action::create<engine::action_lua_callback>(script, handler);
+
+						push_ref(L, action);
+
+						return 1;
+					}
+				}
                 
-                return 1;
+                return 0;
             }
             
             int destroy(lua_State* L)

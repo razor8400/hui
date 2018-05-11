@@ -4,6 +4,8 @@
 
 namespace engine
 {
+    static const int max_atlas = 1024;
+    
     font_ttf::font_ttf(const std::string& font_name) : m_font_name(font_name)
     {
         
@@ -48,6 +50,13 @@ namespace engine
         
         for (auto& ch : text)
         {
+			if (ch == '\n')
+			{
+				y -= size;
+				x = 0;
+				continue;
+			}
+
             auto it = atlas.glyphs.find(ch);
             
             if (it == atlas.glyphs.end())
@@ -114,12 +123,12 @@ namespace engine
         
         buffer.insert(buffer.end(), text.begin(), text.end());
         
-        m_cache[size] = font_utils::create_atlas(m_font_name, size, buffer);
+        m_cache[size] = font_utils::create_atlas(m_font_name, size, buffer, max_atlas);
     }
     
     math::vector2d font_ttf::text_size(const std::string& text, int size) const
     {
-        auto sz = font_utils::text_size(m_font_name, size, text);
+        auto sz = font_utils::text_size(m_font_name, size, text, 0);
         return math::vector2d(sz.w, sz.h);
     }
 }

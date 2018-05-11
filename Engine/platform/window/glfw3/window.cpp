@@ -49,6 +49,18 @@ namespace engine
         }
     }
     
+    void window_focus_callback(GLFWwindow* window, int focused)
+    {
+        if (focused)
+        {
+            director::instance().on_focus();
+        }
+        else
+        {
+            director::instance().on_lost_focus();
+        }
+    }
+    
 	window::window()
 	{
 
@@ -81,6 +93,8 @@ namespace engine
         
         glfwSetWindowCloseCallback(g_window, window_close_callback);
         glfwSetWindowIconifyCallback(g_window, window_iconify_callback);
+        
+        glfwSetWindowFocusCallback(g_window, window_focus_callback);
 
 		return true;
 	}

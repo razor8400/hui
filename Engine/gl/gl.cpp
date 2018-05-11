@@ -3,8 +3,9 @@
 
 namespace gl
 {
-    static GLuint vertex_array;
+    static GLuint vbo;
     static GLuint current_texture = -1;
+    static GLuint draw_calls = 0;
     static std::vector<std::string> error_messages;
     
     namespace vertex_attribute
@@ -43,8 +44,8 @@ namespace gl
     
 	void generate_buffers()
 	{
-		glGenVertexArrays(1, &vertex_array);
-		glBindVertexArray(vertex_array);
+		glGenVertexArrays(1, &vbo);
+		glBindVertexArray(vbo);
         
         glGenBuffers(1, &buffers::position);
 		glGenBuffers(1, &buffers::color);
@@ -53,7 +54,7 @@ namespace gl
     
 	void clear_buffers()
 	{
-		glDeleteVertexArrays(1, &vertex_array);
+		glDeleteVertexArrays(1, &vbo);
         
         glDeleteBuffers(1, &buffers::position);
         glDeleteBuffers(1, &buffers::texture_position);
@@ -249,6 +250,8 @@ namespace gl
         glDisableVertexAttribArray(vertex_attribute::texture_position);
         
         glDeleteBuffers(1, &index_buffer);
+        
+        ++draw_calls;
     }
 
 	void draw_texture2d(const std::vector<math::vector2d>& vertices, const std::vector<math::vector2d>& uv, const std::vector<math::vector4d>& colors)
@@ -300,6 +303,8 @@ namespace gl
         glDisable(GL_BLEND);
 
 		glDeleteBuffers(1, &index_buffer);
+        
+        ++draw_calls;
 	}
     
     void draw_solid_rect(float x, float y, float width, float height, const math::vector3d& color)
@@ -343,6 +348,8 @@ namespace gl
         
         glDisableVertexAttribArray(vertex_attribute::position);
         glDisableVertexAttribArray(vertex_attribute::color);
+        
+        ++draw_calls;
     }
     
     const std::vector<std::string>& get_errors()
@@ -353,6 +360,11 @@ namespace gl
     void clear_errors()
     {
         error_messages.clear();
+    }
+    
+    int get_draw_calls()
+    {
+        return draw_calls;
     }
 
 	void sub_image2d(GLuint texture, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
@@ -393,6 +405,8 @@ namespace gl
         
 		glDisableVertexAttribArray(vertex_attribute::position);
         glDisableVertexAttribArray(vertex_attribute::color);
+        
+        ++draw_calls;
     }
     
     void draw_rect(float x, float y, float width, float height)

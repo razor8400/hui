@@ -49,23 +49,24 @@ namespace engine
     
     action_lua_callback::~action_lua_callback()
     {
-        scripting::clear_ref(m_state, m_handler);
+		m_script->clear_ref(m_handler);
     }
     
-    bool action_lua_callback::init(lua_State* state, int handler)
+    bool action_lua_callback::init(const script_ptr& script, int handler)
     {
-        if (!state)
+        if (!script)
             return false;
         
         m_handler = handler;
-        m_state = state;
+        m_script = script;
         
         return true;
     }
     
     bool action_lua_callback::handle_action()
     {
-        scripting::call_method(m_state, m_handler);
+		assert(m_script);
+		m_script->call_function(m_handler);
         
         return true;
     }

@@ -20,7 +20,7 @@ namespace engine
         
         operator T*() const;
         
-        const T& operator*() const;
+        T& operator*() const;
         T* operator->() const;
     private:
         T* m_obj = nullptr;

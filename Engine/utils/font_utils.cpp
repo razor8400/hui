@@ -16,7 +16,7 @@ namespace engine
         bool load_font(const std::string& file_name, const std::string& font_name) const;
 		bool load_glyphs(font_utils::atlas* atlas, const std::string& font_name, int font_size, const std::string& text) const;
         
-        font_utils::size text_size(const std::string& font_name, int font_size, const std::string& text) const;
+        font_utils::size text_size(const std::string& font_name, int font_size, const std::string& text, int max_width) const;
         void unload_font(const std::string& font_name);
     private:
         FT_Library m_libary;
@@ -124,7 +124,7 @@ namespace engine
             glyph.tx = (float)x / atlas->width;
             glyph.ty = (float)y / atlas->height;
 
-			gl::sub_image2d(atlas->texture, GL_TEXTURE_2D, 0, x, 0, glyph.bw, glyph.bh, GL_RED, GL_UNSIGNED_BYTE, ft->bitmap.buffer);
+			gl::sub_image2d(atlas->texture, GL_TEXTURE_2D, 0, x, y, glyph.bw, glyph.bh, GL_RED, GL_UNSIGNED_BYTE, ft->bitmap.buffer);
 
 			x += ft->bitmap.width;
 
@@ -134,7 +134,7 @@ namespace engine
 		return true;
 	}
         
-	font_utils::size free_type_library::text_size(const std::string& font_name, int font_size, const std::string& text) const
+	font_utils::size free_type_library::text_size(const std::string& font_name, int font_size, const std::string& text, int max_width) const
 	{
 		if (!library_loaded())
 			return font_utils::size();
@@ -150,7 +150,8 @@ namespace engine
 		auto face = it->second;
 		
 		int w = 0;
-		int h = 0;
+        
+        font_utils::size size;
 
 		for (auto& ch : text)
 		{
@@ -165,10 +166,19 @@ namespace engine
 			auto glyph = face->glyph;
 
 			w += glyph->advance.x >> 6;
-			h = std::max(h, (int)face->glyph->bitmap.rows);
+            
+            if (max_width > 0 && w >= max_width)
+            {
+                size.w = w;
+                size.h += font_size;
+                w = 0;
+            }
 		}
+        
+        size.h = std::max(size.h, font_size);
+        size.w = std::max(size.w, w);
 		
-        return { w, h };
+        return size;
 	}
 
 	void free_type_library::unload_font(const std::string& font_name)
@@ -207,10 +217,10 @@ namespace engine
             library.unload_font(font_name);
         }
 		
-		atlas create_atlas(const std::string& font_name, int font_size, const std::string& text)
+		atlas create_atlas(const std::string& font_name, int font_size, const std::string& text, int max_width)
 		{
 			auto at = atlas();
-			auto size = text_size(font_name, font_size, text);
+			auto size = text_size(font_name, font_size, text, max_width);
 
 			at.texture = gl::load_texture(0, size.w, size.h, GL_RED);
             at.width = size.w;
@@ -222,9 +232,9 @@ namespace engine
 			return at;
 		}
 
-		size text_size(const std::string& font_name, int font_size, const std::string& text)
+		size text_size(const std::string& font_name, int font_size, const std::string& text, int max_width)
 		{
-			return library.text_size(font_name, font_size, text);
+			return library.text_size(font_name, font_size, text, max_width);
 		}
     }
 }

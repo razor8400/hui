@@ -64,10 +64,10 @@ namespace engine
     public:
         ~action_lua_callback();
         
-        bool init(lua_State* state, int handler);
+        bool init(const script_ptr& script, int handler);
         bool handle_action() override;
     private:
-        lua_State* m_state;
+		script_ptr m_script;
         int m_handler;
     };
     

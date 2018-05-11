@@ -63,17 +63,11 @@ namespace engine
 		return init(atlas->get_texture(), frame.frame);
 	}
     
-	void sprite::draw(const math::mat4& t)
-	{
-		if (m_texture)
-			m_quad = update_quad();
-
-		game_object::draw(t);
-	}
-
 	void sprite::render(const math::mat4& t)
     {
 		auto texture = get_texture();
+        
+        update_color();
 
         if (texture)
         {
@@ -116,36 +110,37 @@ namespace engine
     void sprite::set_texture(const texture2d_ptr& texture, const math::rect& rect)
     {
         m_texture = texture;
-		m_texture_rect = rect;
+        
+        set_texture_rect(rect);
     }
 
-    sprite::quad sprite::update_quad() const
+    void sprite::update_texture_position()
 	{
-        assert(m_texture);
+        if (!m_texture)
+            return;
         
 		auto origin = m_texture_rect.get_origin();
         auto frame_size = m_texture_rect.get_size();
         
 		auto texture_size = math::vector2d(m_texture->get_width(), m_texture->get_height());
 		auto offset = (math::vector2d(m_size.x, m_size.y) - frame_size) / 2;
+        
+        m_quad.vertices.clear();
+        m_quad.uv.clear();
 
-		auto color = get_color_rgba();
-
-		quad quad;
-
-		quad.vertices.push_back(offset);
-        quad.vertices.push_back({ offset.x + frame_size.x, offset.y });
-        quad.vertices.push_back({ frame_size + offset });
-        quad.vertices.push_back({ offset.x, frame_size.y + offset.y });
+		m_quad.vertices.push_back(offset);
+        m_quad.vertices.push_back({ offset.x + frame_size.x, offset.y });
+        m_quad.vertices.push_back({ frame_size + offset });
+        m_quad.vertices.push_back({ offset.x, frame_size.y + offset.y });
 
 		if (m_rotated)
 		{
-            quad.uv.push_back({ origin.x / texture_size.x, origin.y / texture_size.y });
-            quad.uv.push_back({ (origin.x + frame_size.y) / texture_size.x, origin.y / texture_size.y });
-            quad.uv.push_back({ (origin.x + frame_size.y) / texture_size.x, (origin.y + frame_size.x) / texture_size.y });
-            quad.uv.push_back({ origin.x / texture_size.x, (origin.y + frame_size.x) / texture_size.y });
+            m_quad.uv.push_back({ origin.x / texture_size.x, origin.y / texture_size.y });
+            m_quad.uv.push_back({ (origin.x + frame_size.y) / texture_size.x, origin.y / texture_size.y });
+            m_quad.uv.push_back({ (origin.x + frame_size.y) / texture_size.x, (origin.y + frame_size.x) / texture_size.y });
+            m_quad.uv.push_back({ origin.x / texture_size.x, (origin.y + frame_size.x) / texture_size.y });
 
-			for (auto& vertice : quad.vertices)
+			for (auto& vertice : m_quad.vertices)
 			{
 				auto t = vertice.x;
 				vertice.x = vertice.y;
@@ -154,15 +149,20 @@ namespace engine
 		}
 		else
 		{
-            quad.uv.push_back({ origin.x / texture_size.x, (origin.y + frame_size.y) / texture_size.y });
-            quad.uv.push_back({ (origin.x + frame_size.x) / texture_size.x, (origin.y + frame_size.y) / texture_size.y });
-            quad.uv.push_back({ (origin.x + frame_size.x) / texture_size.x, origin.y / texture_size.y });
-            quad.uv.push_back({ origin.x / texture_size.x, origin.y / texture_size.y });
+            m_quad.uv.push_back({ origin.x / texture_size.x, (origin.y + frame_size.y) / texture_size.y });
+            m_quad.uv.push_back({ (origin.x + frame_size.x) / texture_size.x, (origin.y + frame_size.y) / texture_size.y });
+            m_quad.uv.push_back({ (origin.x + frame_size.x) / texture_size.x, origin.y / texture_size.y });
+            m_quad.uv.push_back({ origin.x / texture_size.x, origin.y / texture_size.y });
 		}
-        
-        for (auto i = 0; i < quad.vertices.size(); ++i)
-            quad.colors.push_back(color);
-
-		return quad;
 	}
+    
+    void sprite::update_color()
+    {
+        m_quad.colors.clear();
+        
+        auto color = get_color_rgba();
+        
+        for (size_t i = 0; i < m_quad.vertices.size(); ++i)
+            m_quad.colors.push_back(color);
+    }
 }

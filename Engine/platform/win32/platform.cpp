@@ -1,4 +1,8 @@
 #include "common.h"
+
+#include <windows.h>
+#include <psapi.h>
+
 #include "platform/platform.h"
 
 namespace engine
@@ -24,5 +28,12 @@ namespace engine
 	const char* platform::get_platform_code() const
 	{
 		return platform_code;
+	}
+
+	size_t platform::get_memory_used() const
+	{
+		PROCESS_MEMORY_COUNTERS pmc;
+		GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+		return pmc.WorkingSetSize / 1024;
 	}
 }

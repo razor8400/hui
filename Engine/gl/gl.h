@@ -34,6 +34,7 @@ namespace gl
     
     const std::vector<std::string>& get_errors();
     void clear_errors();
+    int get_draw_calls();
     
 	void sub_image2d(GLuint texture, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels);
 

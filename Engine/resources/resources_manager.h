@@ -12,6 +12,8 @@ namespace engine
         template<class T>
         std::shared_ptr<T> load_resource_from_file(const std::string& file_name) const;
         
+		template<class T>
+		std::vector<std::shared_ptr<T>> get_resources() const;
         void clear_cache();
     private:
         resources_manager();

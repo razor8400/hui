@@ -22,4 +22,20 @@ namespace engine
         
         return resource;
     }
+
+	template<class T>
+	std::vector<std::shared_ptr<T>> resources_manager::get_resources() const
+	{
+		std::vector<std::shared_ptr<T>> resources;
+		
+		for (auto it : m_resources)
+		{
+			auto ptr = std::dynamic_pointer_cast<T>(it.second);
+
+			if (ptr)
+				resources.push_back(ptr);
+		}
+
+		return resources;
+	}
 }

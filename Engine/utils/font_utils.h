@@ -22,7 +22,7 @@ namespace engine
 
         struct size
         {
-            int w, h;
+            int w = 0, h = 0;
         };
         
 		struct atlas
@@ -36,7 +36,7 @@ namespace engine
 		bool load_font(const std::string& file_name, const std::string& font_name);
 		void unload_font(const std::string& font_name);
 
-		atlas create_atlas(const std::string& font_name, int font_size, const std::string& text);
-		size text_size(const std::string& font_name, int font_size, const std::string& text);
+		atlas create_atlas(const std::string& font_name, int font_size, const std::string& text, int max_width);
+		size text_size(const std::string& font_name, int font_size, const std::string& text, int max_width);
     }
 }

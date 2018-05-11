@@ -86,7 +86,7 @@ namespace engine
     }
     
     template<class T>
-    const T& pointer<T>::operator*() const
+    T& pointer<T>::operator*() const
     {
         return *m_obj;
     }

@@ -66,9 +66,6 @@ namespace engine
     
     bool script::load(const unsigned char* data, size_t size)
     {
-        if (m_state)
-            return false;
-		        
         m_buffer.clear();
         m_buffer.reserve(size);
         m_buffer.insert(m_buffer.end(), data, data + size);
@@ -76,18 +73,34 @@ namespace engine
         return m_buffer.size() > 0;
     }
     
-    void script::call_function(const std::string& function)
+	void script::call_function(int handler)
+	{
+		if (m_state)
+			scripting::call_method(m_state, handler);
+	}
+
+	void script::call_function(const std::string& function)
     {
-        scripting::call_method(m_state, m_name, function);
+		if (m_state)
+			scripting::call_method(m_state, m_name, function);
     }
     
     bool script::call_boolean_function(const std::string& function) const
     {
-        return scripting::call_boolean_method(m_state, m_name, function);
+		if (m_state)
+			return scripting::call_boolean_method(m_state, m_name, function);
+		return false;
     }
     
     void script::push_vector(const std::string& field, const math::vector3d& v3)
     {
-        scripting::push_to_table(m_state, m_name, field, v3);
+		if (m_state)
+			scripting::push_to_table(m_state, m_name, field, v3);
     }
+
+	void script::clear_ref(int handler)
+	{
+		if (m_state)
+			scripting::clear_ref(m_state, handler);
+	}
 }
