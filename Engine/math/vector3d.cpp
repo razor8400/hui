@@ -16,6 +16,11 @@ namespace math
         
     }
     
+    vector3d::vector3d(int x1, int y1, int z1) : x((int)x1), y((int)y1), z((int)z1)
+    {
+        
+    }
+    
     vector3d::vector3d(float x1, float y1, float z1) : x(x1), y(y1), z(z1)
     {
         

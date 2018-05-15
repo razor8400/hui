@@ -9,6 +9,7 @@ namespace math
         float x, y, z;
         
         vector3d();
+        vector3d(int x1, int y1, int z1);
         vector3d(float x1, float y1, float z1);
         vector3d(const vector2d& v2);
 

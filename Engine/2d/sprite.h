@@ -21,29 +21,17 @@ namespace engine
         bool init(const texture2d_ptr& texture, const math::rect& rect);
 		bool init(const std::string& atlas_name, const std::string& file_name);
 
-        void render(const math::mat4& t) override;
-
-		void clear_texture();
         void set_texture(const std::string& file_name);
         void set_texture(const texture2d_ptr& texture);
         void set_texture(const texture2d_ptr& texture, const math::rect& rect);
-		
-        const texture2d_ptr& get_texture() const { return m_texture; }
 
 		const math::rect& get_texture_rect() const { return m_texture_rect; }
-        void set_texture_rect(const math::rect& texture_rect) { m_texture_rect = texture_rect; update_texture_position(); }
-        
-        const quad& quad() const { return m_quad; }
-        
-        void update_color();
+        void set_texture_rect(const math::rect& texture_rect) { m_texture_rect = texture_rect; update_vertices(); }
     private:
-        void update_texture_position();
-    protected:
-        texture2d_ptr m_texture;
+        void update_vertices();
+    private:
 		math::rect m_texture_rect;
 
 		bool m_rotated = false;
-
-		struct quad m_quad;
     };
 }

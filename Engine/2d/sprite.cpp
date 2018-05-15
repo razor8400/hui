@@ -62,30 +62,6 @@ namespace engine
 
 		return init(atlas->get_texture(), frame.frame);
 	}
-    
-	void sprite::render(const math::mat4& t)
-    {
-		auto texture = get_texture();
-        
-        update_color();
-
-        if (texture)
-        {
-			if (m_shader_program)
-				m_shader_program->use(t);
-
-            gl::bind_texture(texture->get_texture_id());
-            gl::set_blend_func(m_blend_func.source, m_blend_func.destination);
-            gl::draw_texture2d(m_quad.vertices, m_quad.uv, m_quad.colors);
-        }
-        
-		game_object::render(t);
-    }
-
-	void sprite::clear_texture()
-	{
-        m_texture.reset();
-	}
 
 	void sprite::set_texture(const std::string& file_name)
     {
@@ -110,59 +86,47 @@ namespace engine
     void sprite::set_texture(const texture2d_ptr& texture, const math::rect& rect)
     {
         m_texture = texture;
-        
         set_texture_rect(rect);
     }
-
-    void sprite::update_texture_position()
-	{
+    
+    void sprite::update_vertices()
+    {
         if (!m_texture)
             return;
         
-		auto origin = m_texture_rect.get_origin();
+        auto origin = m_texture_rect.get_origin();
         auto frame_size = m_texture_rect.get_size();
         
-		auto texture_size = math::vector2d(m_texture->get_width(), m_texture->get_height());
-		auto offset = (math::vector2d(m_size.x, m_size.y) - frame_size) / 2;
+        auto texture_size = math::vector2d(m_texture->get_width(), m_texture->get_height());
+        auto offset = (m_size - frame_size) / 2;
         
-        m_quad.vertices.clear();
-        m_quad.uv.clear();
-
-		m_quad.vertices.push_back(offset);
-        m_quad.vertices.push_back({ offset.x + frame_size.x, offset.y });
-        m_quad.vertices.push_back({ frame_size + offset });
-        m_quad.vertices.push_back({ offset.x, frame_size.y + offset.y });
-
-		if (m_rotated)
-		{
-            m_quad.uv.push_back({ origin.x / texture_size.x, origin.y / texture_size.y });
-            m_quad.uv.push_back({ (origin.x + frame_size.y) / texture_size.x, origin.y / texture_size.y });
-            m_quad.uv.push_back({ (origin.x + frame_size.y) / texture_size.x, (origin.y + frame_size.x) / texture_size.y });
-            m_quad.uv.push_back({ origin.x / texture_size.x, (origin.y + frame_size.x) / texture_size.y });
-
-			for (auto& vertice : m_quad.vertices)
-			{
-				auto t = vertice.x;
-				vertice.x = vertice.y;
-				vertice.y = t;
-			}
-		}
-		else
-		{
-            m_quad.uv.push_back({ origin.x / texture_size.x, (origin.y + frame_size.y) / texture_size.y });
-            m_quad.uv.push_back({ (origin.x + frame_size.x) / texture_size.x, (origin.y + frame_size.y) / texture_size.y });
-            m_quad.uv.push_back({ (origin.x + frame_size.x) / texture_size.x, origin.y / texture_size.y });
-            m_quad.uv.push_back({ origin.x / texture_size.x, origin.y / texture_size.y });
-		}
-	}
-    
-    void sprite::update_color()
-    {
-        m_quad.colors.clear();
+        m_vertices.resize(gl::quad_size);
         
-        auto color = get_color_rgba();
+        m_vertices[gl::bottom_left].vertice = offset;
+        m_vertices[gl::bottom_right].vertice = { offset.x + frame_size.x, offset.y, 0.0f };
+        m_vertices[gl::top_right].vertice = { math::vector3d(frame_size.x, frame_size.y, 0.0f) + offset };
+        m_vertices[gl::top_left].vertice = { offset.x, frame_size.y + offset.y, 0.0f };
         
-        for (size_t i = 0; i < m_quad.vertices.size(); ++i)
-            m_quad.colors.push_back(color);
+        if (m_rotated)
+        {
+            m_vertices[gl::bottom_left].tex_coord = { origin.x / texture_size.x, origin.y / texture_size.y };
+            m_vertices[gl::bottom_right].tex_coord = { (origin.x + frame_size.y) / texture_size.x, origin.y / texture_size.y };
+            m_vertices[gl::top_right].tex_coord = { (origin.x + frame_size.y) / texture_size.x, (origin.y + frame_size.x) / texture_size.y };
+            m_vertices[gl::top_left].tex_coord = { origin.x / texture_size.x, (origin.y + frame_size.x) / texture_size.y };
+            
+            for (auto& v : m_vertices)
+            {
+                auto t = v.vertice.x;
+                v.vertice.x = v.vertice.y;
+                v.vertice.y = t;
+            }
+        }
+        else
+        {
+            m_vertices[gl::bottom_left].tex_coord = { origin.x / texture_size.x, (origin.y + frame_size.y) / texture_size.y };
+            m_vertices[gl::bottom_right].tex_coord = { (origin.x + frame_size.x) / texture_size.x, (origin.y + frame_size.y) / texture_size.y };
+            m_vertices[gl::top_right].tex_coord = { (origin.x + frame_size.x) / texture_size.x, origin.y / texture_size.y };
+            m_vertices[gl::top_left].tex_coord = { origin.x / texture_size.x, origin.y / texture_size.y };
+        }
     }
 }

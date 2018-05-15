@@ -13,6 +13,8 @@ namespace engine
 
 		void set_camera_position(const math::vector3d& position);
 		void draw_scene(scene* scene);
+        void add_command(const render_command_ptr& command);
+        void add_post_draw_command(const render_command_ptr& command);
 		void dump_camera_settings();
         
         const math::mat4& get_world() const { return m_world; }
@@ -27,5 +29,8 @@ namespace engine
 
 		math::vector3d m_camera_position = math::vector3d(0, 0, -1);
 		math::mat4 m_world;
+        
+        std::vector<render_command_ptr> m_draw_commands;
+        std::vector<render_command_ptr> m_post_draw_commands;
 	};
 }

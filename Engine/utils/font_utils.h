@@ -25,18 +25,18 @@ namespace engine
             int w = 0, h = 0;
         };
         
-		struct atlas
+		struct atlas_info
 		{
 			int texture;
             int width;
             int height;
 			glyphs_map glyphs;
 		};
-                
+        
 		bool load_font(const std::string& file_name, const std::string& font_name);
 		void unload_font(const std::string& font_name);
 
-		atlas create_atlas(const std::string& font_name, int font_size, const std::string& text, int max_width);
+		atlas_info create_atlas(const std::string& font_name, int font_size, const std::string& text, int max_width);
 		size text_size(const std::string& font_name, int font_size, const std::string& text, int max_width);
     }
 }

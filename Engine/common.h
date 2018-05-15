@@ -3,8 +3,10 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <map>
+#include <set>
 #include <numeric>
 #include <functional>
 #include <queue>
@@ -29,7 +31,6 @@ namespace engine
     
     class sprite;
     class label;
-    class batch_sprite;
     
 	class scene;
 	class game_object;
@@ -41,17 +42,34 @@ namespace engine
     class script;
     
     class touch_listener;
+    class render_command;
     
     typedef std::shared_ptr<resource> resource_ptr;
     typedef std::shared_ptr<texture2d> texture2d_ptr;
     typedef std::shared_ptr<script> script_ptr;
     typedef std::shared_ptr<font_ttf> font_ttf_ptr;
+    
+    typedef std::shared_ptr<render_command> render_command_ptr;
 
 	enum projection_mode
 	{
 		ortographic, perspective
 	};
-    
+
+	enum class vertical_text_alignment
+	{
+		left,
+		center,
+		right
+	};
+
+	enum class horisontal_text_alignment
+	{
+		top,
+		center,
+		bottom
+	};
+	
     static const std::string empty_string;
     
 	static std::string vector3d_to_string(const math::vector3d& v3)

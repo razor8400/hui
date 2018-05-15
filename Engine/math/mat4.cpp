@@ -73,7 +73,7 @@ namespace math
         return mat;
     }
 
-    mat4 mat4::rotate(const vector3d & axis, float angle)
+    mat4 mat4::rotate(const vector3d& axis, float angle)
     {
         mat4 mat;
 

@@ -12,7 +12,6 @@
 #include "components/action.h"
 
 #include "2d/sprite.h"
-#include "2d/batch_sprite.h"
 #include "2d/label.h"
 
 #include "resources/resources_manager.h"

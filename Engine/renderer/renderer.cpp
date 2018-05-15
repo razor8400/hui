@@ -1,5 +1,6 @@
 #include "common.h"
 #include "renderer.h"
+#include "render_command.h"
 
 #include "core/application.h"
 #include "core/scene.h"
@@ -38,14 +39,37 @@ namespace engine
 
 	void renderer::draw_scene(scene* scene)
 	{
+        gl::clear();
+        
 		if (scene)
-		{
-			gl::clear();
-
-			scene->draw(m_world);
-		}
+			scene->draw(this);
+        
+        for (auto& command : m_draw_commands)
+        {
+			command->execute(m_world);
+			command->reset();
+        }
+        
+        for (auto& command : m_post_draw_commands)
+        {
+			command->execute(m_world);
+			command->reset();
+        }
+        
+        m_draw_commands.clear();
+        m_post_draw_commands.clear();
 	}
+    
+    void renderer::add_command(const render_command_ptr& command)
+    {
+        m_draw_commands.push_back(command);
+    }
 
+    void renderer::add_post_draw_command(const render_command_ptr& command)
+    {
+        m_post_draw_commands.push_back(command);
+    }
+    
 	void renderer::dump_camera_settings()
 	{
 		logger() << "[camera] "

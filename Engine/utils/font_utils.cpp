@@ -14,7 +14,7 @@ namespace engine
         
 		bool library_loaded() const;
         bool load_font(const std::string& file_name, const std::string& font_name) const;
-		bool load_glyphs(font_utils::atlas* atlas, const std::string& font_name, int font_size, const std::string& text) const;
+		bool load_glyphs(font_utils::atlas_info* atlas, const std::string& font_name, int font_size, const std::string& text) const;
         
         font_utils::size text_size(const std::string& font_name, int font_size, const std::string& text, int max_width) const;
         void unload_font(const std::string& font_name);
@@ -81,7 +81,7 @@ namespace engine
         return true;
     }
 
-	bool free_type_library::load_glyphs(font_utils::atlas* atlas, const std::string& font_name, int font_size, const std::string& text) const
+	bool free_type_library::load_glyphs(font_utils::atlas_info* atlas, const std::string& font_name, int font_size, const std::string& text) const
 	{
         assert(atlas);
 
@@ -148,14 +148,23 @@ namespace engine
 		}
 
 		auto face = it->second;
+
+		FT_Set_Pixel_Sizes(face, 0, font_size);
 		
 		int w = 0;
         
         font_utils::size size;
 
+		size.h = font_size;
+
 		for (auto& ch : text)
 		{
-			FT_Set_Pixel_Sizes(face, 0, font_size);
+			if (ch == '\n' || (max_width > 0 && w >= max_width))
+			{
+				size.w = w;
+				size.h += font_size;
+				w = 0;
+			}
 
 			if (FT_Load_Char(face, ch, FT_LOAD_RENDER))
 			{
@@ -166,16 +175,8 @@ namespace engine
 			auto glyph = face->glyph;
 
 			w += glyph->advance.x >> 6;
-            
-            if (max_width > 0 && w >= max_width)
-            {
-                size.w = w;
-                size.h += font_size;
-                w = 0;
-            }
 		}
         
-        size.h = std::max(size.h, font_size);
         size.w = std::max(size.w, w);
 		
         return size;
@@ -217,9 +218,9 @@ namespace engine
             library.unload_font(font_name);
         }
 		
-		atlas create_atlas(const std::string& font_name, int font_size, const std::string& text, int max_width)
+		atlas_info create_atlas(const std::string& font_name, int font_size, const std::string& text, int max_width)
 		{
-			auto at = atlas();
+			auto at = atlas_info();
 			auto size = text_size(font_name, font_size, text, max_width);
 
 			at.texture = gl::load_texture(0, size.w, size.h, GL_RED);

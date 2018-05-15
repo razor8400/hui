@@ -42,7 +42,6 @@ namespace engine
         {
             register_class<engine::game_object>(state, scripting::game_object::functions);
             register_class<engine::sprite>(state, scripting::sprite::functions);
-			register_class<engine::batch_sprite>(state, scripting::batch_sprite::functions);
             register_class<engine::scene>(state, scripting::scene::functions);
             
             register_class<engine::box_collider2d>(state, scripting::box_collider2d::functions);

@@ -1,6 +1,10 @@
 #include "common.h"
 #include "resources/resources_manager.h"
 #include "resources/font_ttf.h"
+
+#include "renderer/render_command.h"
+#include "renderer/renderer.h"
+
 #include "label.h"
 
 namespace engine
@@ -39,25 +43,20 @@ namespace engine
         auto font = resources_manager::instance().load_resource_from_file<font_ttf>(font_name);
         set_font(font);
     }
-    
-	void label::render(const math::mat4& t)
-	{      
-		if (m_font)
-		{
-            if (m_shader_program)
-                m_shader_program->use(t);
-            
-            gl::set_blend_func(m_blend_func.source, m_blend_func.destination);
-            
-            m_font->render_text(m_caption, m_font_size, get_color_rgba());
-		}
-        
-        game_object::render(t);
-	}
-    
+
     void label::update_size()
     {
         if (m_font)
-            m_size = m_font->text_size(m_caption, m_font_size);
+            m_size = m_font->text_size(m_caption, m_font_size, m_max_line_width);
+    }
+    
+    void label::update_texture()
+    {
+        clear_texture();
+        
+        m_vertices.clear();
+        
+        if (m_font)
+            m_texture = m_font->create_label(m_caption, m_font_size, m_max_line_width, m_vertical_alignment, m_horisontal_alignment, &m_vertices);
     }
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <memory>
 #include <functional>
@@ -10,6 +11,8 @@
 
 namespace gl
 {
+    struct v3f_c4f_t2f;
+    
     bool init_gl();
 
     void enable_depth();
@@ -24,13 +27,13 @@ namespace gl
     
     void bind_texture(GLuint texture);
     void set_blend_func(GLenum source, GLenum destination);
-    void draw_texture2d(const std::vector<math::vector2d>& vertices, const std::vector<math::vector2d>& uv);
-	void draw_texture2d(const std::vector<math::vector2d>& vertices, const std::vector<math::vector2d>& uv, const std::vector<math::vector4d>& colors);
+    
+    void draw_vertices(const std::vector<v3f_c4f_t2f>& vertices, const std::vector<GLushort>& indices);
+
     void delete_texture(GLuint texture);
     
     void draw_line(float x1, float y1, float x2, float y2);
     void draw_rect(float x, float y, float width, float height);
-    void draw_solid_rect(float x, float y, float width, float height, const math::vector3d& color);
     
     const std::vector<std::string>& get_errors();
     void clear_errors();
@@ -43,4 +46,20 @@ namespace gl
         GLenum source;
         GLenum destination;
     };
+    
+    struct v3f_c4f_t2f
+    {
+        math::vector3d vertice;
+        math::vector4d color = math::vector4d::one;
+        math::vector2d tex_coord;
+    };
+    
+    static const int quad_size = 4;
+    
+    static const int bottom_left = 0;
+    static const int bottom_right = 1;
+    static const int top_right = 2;
+    static const int top_left = 3;
+    
+    typedef std::array<v3f_c4f_t2f, quad_size> v3f_c4f_t2f_quad;
 }

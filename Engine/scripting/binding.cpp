@@ -813,28 +813,6 @@ namespace engine
                 return 1;
             }
         }
-
-		namespace batch_sprite
-		{
-			int create(lua_State* L)
-			{
-				if (lua_isstring(L, 1))
-				{
-					auto texture = lua_tostring(L, 1);
-
-					CLEAR_TOP(L);
-
-					return game_object::create<engine::batch_sprite>(L, texture);
-				}
-
-				return game_object::create<engine::batch_sprite>(L);
-			}
-
-			int destroy(lua_State* L)
-			{
-				return destroy_ref<engine::batch_sprite>(L);
-			}
-		}
         
         namespace targeted_action
         {
